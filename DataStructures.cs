@@ -46,8 +46,7 @@ namespace VisualKeyloggerDetector.Core
         public double MinAverageWriteBytesPerInterval { get; set; } = 200;
 
        
-        public string ResultsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "detector_results_v2.txt");
-
+        
 
 
         public Dictionary<uint, ProcessInfoData> ProcessInfoDataMap = new Dictionary<uint, ProcessInfoData>();
@@ -64,11 +63,9 @@ namespace VisualKeyloggerDetector.Core
 
         public List<string> ExcludedPathPrefixes { get; set; } = new List<string>
         {
-            /*  @"C:\Windows\",
-              @"C:\Program Files\",
-              @"C:\Program Files (x86)\"
-              // Add other known safe system/application directories
-          */
+             @"C:\Windows\",
+             // Add other known safe system/application directories
+         
         };
     }
     public class ProcessWriteInfoData

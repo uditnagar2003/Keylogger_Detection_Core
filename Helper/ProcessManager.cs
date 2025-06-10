@@ -41,45 +41,7 @@ namespace VisualKeyloggerDetector.Core.Utils
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool CloseHandle(IntPtr hObject);
 
-       
-        public static bool SuspendProcess(uint processId)
-        {
-            IntPtr hProcess = IntPtr.Zero;
-            try
-            {
-                hProcess = OpenProcess(ProcessAccessFlags.SuspendResume, false, processId);
-                if (hProcess == IntPtr.Zero)
-                {
-                    Console.WriteLine($"Failed to open process {processId}. Error: {Marshal.GetLastWin32Error()}");
-                    return false;
-                }
-
-                int ntStatus = NtSuspendProcess(hProcess);
-                if (ntStatus != 0) // 0 is STATUS_SUCCESS
-                {
-                    Console.WriteLine($"Failed to suspend process {processId}. NTSTATUS: {ntStatus:X}");
-                    return false;
-                }
-
-                Console.WriteLine($"Process {processId} suspended successfully.");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception suspending process {processId}: {ex.Message}");
-                return false;
-            }
-            finally
-            {
-                if (hProcess != IntPtr.Zero)
-                {
-                    CloseHandle(hProcess);
-                }
-            }
-        }
-
-       
-        
+             
         public static bool TerminateProcess(uint processId)
         {
             IntPtr hProcess = IntPtr.Zero;

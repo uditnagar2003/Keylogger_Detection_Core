@@ -177,8 +177,7 @@ namespace VisualKeyloggerDetector.Core
                 // --- Step 6: Write Results ---
                 OnProgressUpdated(5+_config.PatternLengthN, totalSteps);
                 OnStatusUpdated("Step 6/6: Writing results to file...");
-                WriteResultsToFile(overallResults);
-                OnStatusUpdated($"Results saved to {_config.ResultsFilePath}");
+                OnStatusUpdated($"Results saved ");
 
                 OnProgressUpdated(totalSteps, totalSteps); // Final progress update
                 OnExperimentCompleted(overallResults); // Signal successful completion*/
@@ -321,75 +320,6 @@ namespace VisualKeyloggerDetector.Core
 
             return detectionResults;
         }
-
-        private void WriteResultsToFile(List<DetectionResult> results)
-        {
-            try
-            {
-                // Use FileMode.Create to overwrite the file if it exists
-                using (var file = new StreamWriter(_config.ResultsFilePath, append: false, System.Text.Encoding.UTF8))
-                {
-                    file.WriteLine($"Keylogger Detection Results - {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-                    file.WriteLine($"==================================================");
-                    file.WriteLine($"Pattern Algorithm: {_patternGenerator.AlgorithmTypeName}");
-                    file.WriteLine($"Configuration:");
-                    file.WriteLine($"  Intervals (N): {_config.PatternLengthN}");
-                    file.WriteLine($"  Interval Duration (T): {_config.IntervalDurationT} ms");
-                    file.WriteLine($"  Key Range (Kmin-Kmax): {_config.MinKeysPerIntervalKmin}-{_config.MaxKeysPerIntervalKmax}");
-                    file.WriteLine($"  Detection Threshold (PCC): > {_config.DetectionThreshold:F2}");
-                    file.WriteLine($"  Min Avg Write Filter: > {_config.MinAverageWriteBytesPerInterval:N1} bytes/interval");
-                    file.WriteLine($"==================================================");
-                    file.WriteLine();
-
-                    var detected = results.Where(r => r.IsDetected).ToList();
-                    var notDetected = results.Where(r => !r.IsDetected).ToList();
-
-
-                    if (detected.Any())
-                    {
-                        file.WriteLine($"*** POSSIBLE KEYLOGGERS DETECTED ({detected.Count}) ***");
-                        file.WriteLine($"--------------------------------------------------");
-                        foreach (var result in detected)
-                        {
-                            file.WriteLine($"  Process: {result.ProcessName} (PID: {result.ProcessId})");
-                            file.WriteLine($"  Path:    {result.ExecutablePath ?? "N/A"}");
-                            file.WriteLine($"  PCC:     {result.Correlation:F4} (Threshold: > {_config.DetectionThreshold:F2})");
-                            file.WriteLine($"  AvgWrite:{result.AverageBytesWrittenPerInterval:N1} bytes/interval");
-                            file.WriteLine($"--------------------------------------------------");
-                        }
-                    }
-                    else
-                    {
-                        file.WriteLine(">>> No processes met the detection criteria (PCC > Threshold).");
-                        file.WriteLine();
-                    }
-
-                    if (notDetected.Any())
-                    {
-                        file.WriteLine();
-                        file.WriteLine($"--- Other Monitored Processes ({notDetected.Count}) ---");
-                        file.WriteLine($"(Processes passing write filter but below PCC threshold or with NaN correlation)");
-                        file.WriteLine($"--------------------------------------------------");
-                        foreach (var result in notDetected)
-                        {
-                            file.WriteLine($"  Process: {result.ProcessName} (PID: {result.ProcessId})");
-                            file.WriteLine($"  Path:    {result.ExecutablePath ?? "N/A"}");
-                            file.WriteLine($"  PCC:     {(double.IsNaN(result.Correlation) ? "NaN" : result.Correlation.ToString("F4"))}");
-                            file.WriteLine($"  AvgWrite:{result.AverageBytesWrittenPerInterval:N1} bytes/interval");
-                            file.WriteLine($"--------------------------------------------------");
-                        }
-                    }
-                    file.WriteLine();
-                    file.WriteLine("End of Report");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Report error but don't crash the controller
-                OnStatusUpdated($"Error writing results file '{_config.ResultsFilePath}': {ex.Message}");
-            }
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -409,14 +339,7 @@ namespace VisualKeyloggerDetector.Core
             }
         }
 
-        // Finalizer (optional, only if you have unmanaged resources directly in this class)
-        // ~ExperimentController()
-        // {
-        //     Dispose(false);
-        // }
-
-        // In ExperimentController.cs
-
+     
 
 
     }
